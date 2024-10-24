@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from "react";
-import { useParams } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 import "./game.css";
 import { io } from "socket.io-client"
 
@@ -39,14 +39,20 @@ function Game() {
   const [currentTurn, setCurrentTurn] = useState("white");
   const [playerColor, setPlayerColor] = useState(null);
   const socketIO = useRef(null)
+
+  // query params /game/sdkjhgfjadshg/somethingelse
+  // search params /something?color=white&day=monday
   const params = useParams()
+  const [searchParams] = useSearchParams()
   // socketIO.current 
   useEffect(()=>{
-    socketIO.current = io("https://chess-game-back-end-7k5r.onrender.com")
+    
+    socketIO.current = io(process.env.REACT_APP_BACKEND_URL+"/")
     
     socketIO.current.on("connect" , () => {
       console.log("Connected to the server");
-      socketIO.current.emit("join", (params.game_id))
+      const color = searchParams.get("color")
+      socketIO.current.emit("join", {id: params.game_id, color: color})
     });
 
     socketIO.current.on("board", (recieveBoard)=>{
@@ -54,6 +60,13 @@ function Game() {
       if(recieveBoard !== null){
         setBoard(recieveBoard.board)
         setCurrentTurn(recieveBoard.currentTurn)
+      }
+    })
+
+    socketIO.current.on("color", (color)=>{
+      console.log(color)
+      if(color !== null){
+        setPlayerColor(color);
       }
     })
 
@@ -73,6 +86,9 @@ function Game() {
   // /game/r1344 - path parameters
 
   const handleCellClick = (row, cell) => {
+    if(currentTurn !== playerColor){
+      return;
+    }
     const piece = board[row][cell];
 
     // a -> A, A->A
@@ -239,6 +255,7 @@ function Game() {
   };
 
   return (
+    <div>
     <div className="chessboard-container">
       {board.map((row, rowIndex) =>
         row.map((cell, cellIndex) => (
@@ -268,6 +285,10 @@ function Game() {
           </div>
         ))
       )}
+    </div>
+    {/*"" - false, null - false, 0 - false, undefinied - false. any non empty str - True */}
+    {playerColor ? <span>You color is {playerColor}</span> : <span>You are a spectator</span>}
+    
     </div>
   );
 }

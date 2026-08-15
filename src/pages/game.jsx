@@ -40,8 +40,10 @@ function Game() {
   const [playerColor, setPlayerColor] = useState(null);
   const socketIO = useRef(null)
 
-  // query params /game/sdkjhgfjadshg/somethingelse
+  // params /game/{parameter}/somethingelse
+  // wikipeda.org/wiki/{parameter}/main
   // search params /something?color=white&day=monday
+  // wikipeda.org/wiki?topic=math
   const params = useParams()
   const [searchParams] = useSearchParams()
   // socketIO.current 
@@ -272,10 +274,6 @@ function Game() {
             style={{ gridRow: rowIndex + 1, gridColumn: cellIndex + 1 }}
             onClick={() => handleCellClick(rowIndex, cellIndex)}
           >
-            {/* <div
-            className={`move-piece ${piece === selectedPiece && onClick={()=> handleCellClick(rowIndex, cellIndex)} ? movePiece : ''}`}
-            > */}
-
             {cell === null ? null : (
               <span className="piece" style={{ color: "black" }}>
                 {pieceSymbols[cell]}

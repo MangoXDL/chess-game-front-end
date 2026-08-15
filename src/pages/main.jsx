@@ -12,9 +12,9 @@ function Main(){
             method: 'POST'
         })
         .then((response)=>response.json())
+        .then(data => navigate(`/game/`+data.id+"?color="+color))
         // .then(data => console.log(data))
         // '123' + 'qwe' ='123qwe'
-        .then(data => navigate(`/game/`+data.id+"?color="+color))
     }
 
     function JoinRoom(){
